@@ -35,7 +35,7 @@ public:
     * Acceso o definición de pares clave/valor
     **/
 
-    T &operator[](const string &key);
+    T &operator[](const string &key); //es lo que va a hacer en el trie
 
     /**
     COUNT
@@ -78,9 +78,7 @@ private:
     struct Nodo {
         Nodo** siguientes[256]; //vector de punteros a siguientes
         T* significado;
-        //Nodo(){
-
-        //}
+        Nodo();
 
     };
 
