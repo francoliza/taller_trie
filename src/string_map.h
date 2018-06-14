@@ -18,12 +18,12 @@ public:
     CONSTRUCTOR POR COPIA
     * Construye un diccionario por copia.
     **/
-    string_map(const string_map<T>& aCopiar);
+    string_map(const string_map<T> &aCopiar);
 
     /**
     OPERADOR ASIGNACION
      */
-    string_map& operator=(const string_map& d);
+    string_map &operator=(const string_map &d);
 
     /**
     DESTRUCTOR
@@ -52,8 +52,9 @@ public:
     --PRODUCE ALIASING--
     -- Versión modificable y no modificable
     **/
-    const T& at(const string& key) const;
-    T& at(const string& key);
+    const T &at(const string &key) const;
+
+    T &at(const string &key);
 
     /**
     ERASE
@@ -61,7 +62,7 @@ public:
     * PRE: La clave está definida.
     --PRODUCE ALIASING--
     **/
-    void erase(const string& key);
+    void erase(const string &key);
 
     /**
      SIZE
@@ -76,13 +77,15 @@ public:
 private:
 
     struct Nodo {
-        Nodo** siguientes[256]; //vector de punteros a siguientes
-        T* significado;
-        Nodo();
-
+        vector<Nodo *> siguientes;
+        T *significado;
+        Nodo(){
+            siguientes = vector<Nodo*>(256,NULL);
+            significado = NULL;
+        }
     };
 
-    Nodo* raiz;
+    Nodo *raiz;
     int _size;
 };
 
