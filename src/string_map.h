@@ -18,12 +18,12 @@ public:
     CONSTRUCTOR POR COPIA
     * Construye un diccionario por copia.
     **/
-    string_map(const string_map<T> &aCopiar);
+    string_map(const string_map<T>& aCopiar);
 
     /**
     OPERADOR ASIGNACION
      */
-    string_map &operator=(const string_map &d);
+    string_map& operator=(const string_map& d);
 
     /**
     DESTRUCTOR
@@ -35,7 +35,7 @@ public:
     * Acceso o definición de pares clave/valor
     **/
 
-    T &operator[](const string &key); //es lo que va a hacer en el trie
+    T &operator[](const string &key);
 
     /**
     COUNT
@@ -52,9 +52,8 @@ public:
     --PRODUCE ALIASING--
     -- Versión modificable y no modificable
     **/
-    const T &at(const string &key) const;
-
-    T &at(const string &key);
+    const T& at(const string& key) const;
+    T& at(const string& key);
 
     /**
     ERASE
@@ -62,7 +61,7 @@ public:
     * PRE: La clave está definida.
     --PRODUCE ALIASING--
     **/
-    void erase(const string &key);
+    void erase(const string& key);
 
     /**
      SIZE
@@ -78,14 +77,14 @@ private:
 
     struct Nodo {
         vector<Nodo *> siguientes;
-        T *significado;
+        T* significado;
         Nodo(){
-            siguientes = vector<Nodo*>(256,NULL);
+            siguientes = vector<Nodo *>(256,NULL);
             significado = NULL;
         }
     };
 
-    Nodo *raiz;
+    Nodo* raiz;
     int _size;
 };
 
