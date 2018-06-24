@@ -78,14 +78,13 @@ private:
     struct Nodo {
         vector<Nodo *> siguientes;
         T* significado;
-        Nodo(){
-            siguientes = vector<Nodo *>(256,NULL);
-            significado = NULL;
-        }
+        Nodo();
     };
 
     Nodo* raiz;
     int _size;
+
+    void deleteRecursivo(Nodo* aBorrar, const string& clave, int i);
 };
 
 #include "string_map.hpp"
