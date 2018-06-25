@@ -20,7 +20,8 @@ string_map<T>::string_map(const string_map<T> &aCopiar)
 
 template<typename T>
 string_map<T> &string_map<T>::operator=(const string_map<T> &d) {
-    // COMPLETAR
+
+    return *this;
 }
 
 template<typename T>
@@ -32,21 +33,19 @@ template<typename T>
 T &string_map<T>::operator[](const string &clave) {
     // COMPLETAR
 
-    if (raiz == NULL) {
+    if (raiz == NULL)
         raiz = new Nodo();
-    }
-    bool flag = false;
-    Nodo *aux = raiz;
 
+    Nodo *aux = raiz;
     int longClave = clave.size();
-    int nombre;
+    int posicion;
 
     for (int i = 0; i < longClave; ++i) {
-        nombre = int(clave[i]);
-        if (aux->siguientes[nombre] == NULL) {
-            aux->siguientes[nombre] = new Nodo();
+        posicion = int(clave[i]);
+        if (aux->siguientes[posicion] == NULL) {
+            aux->siguientes[posicion] = new Nodo();
         }
-        aux = aux->siguientes[nombre];
+        aux = aux->siguientes[posicion];
     }
 
     if (aux->significado == NULL) {
@@ -98,24 +97,16 @@ T &string_map<T>::at(const string &clave) {
 template<typename T>
 void string_map<T>::erase(const string &clave) {
     // COMPLETAR
-    int borrarDesde = 0;
 
     if (count(clave) == 1) { //ya sabemos que esta definida!
         int longClave = clave.size();
         int pos;
         Nodo *aux = raiz;
 
-        if (longClave == 1) {
-            if (_size == 1) {
-                delete raiz;
-                raiz = NULL;
-            } else {
-                pos = int(clave[0]);
-                delete (aux->siguientes[pos])->significado;
-                (aux->siguientes[pos])->significado = NULL;
-                //borro el significado y punto
-            }
-            _size--;
+        if (_size == 1) {
+            raiz = NULL;
+            delete raiz; //aca si es una unica sola clave la borra
+            _size = 0;
             //esta bien
         } else {
             //hay 2 casos mas, borrar una palabra que este en el medio o que el sigficado sea una hoja
@@ -126,8 +117,8 @@ void string_map<T>::erase(const string &clave) {
             for (int i = 0; i < longClave; ++i) {
                 pos = int(clave[i]);
                 if (aux->siguientes[pos] != NULL) {
-                    for (int j = 0; j < 256 && j != pos; ++j) {
-                        if(aux->siguientes[j] != NULL){
+                    for (int j = 0; j < 256; ++j) {
+                        if (j != pos && aux->siguientes[j] != NULL) {
                             ultimaSeparacion = i; //no dice si hay mas nodos en ese nivel, o sea hermanos
                         }
                     }
@@ -139,120 +130,51 @@ void string_map<T>::erase(const string &clave) {
                 }
 
 
-            } //aux llego al final!
-
-            /*Nodo* otraVez = raiz;
-
-            for (int k = 0; k < longClave; ++k) {
-                pos = int(clave[k]);
-            }
-             */
-
-            //fijemosnó si tiene mas hijos o no
+            } //aux llego al final
 
             for (int j = 0; j < 256; ++j) {
                 if (aux->siguientes[j] != NULL) {
                     count++;
                 }
-            }//aca se fija si es hoja o no aux!
+            }// se fija que no tenga mas hijos.
             //con ultimoSignificado nos sirve si el que queremos borrar es la hoja!
 
+            Nodo* aBorrar = raiz;
             if (count == 0) {
-                //es decir es hoja
-                //aca necesitamos el borrar desde
-                //estamos en el ultimo NODO
+                //hay que fijarse tuvo una separacion antes
+                //vamos a tratar de resolver un caso, el de que borramos la palabra al final
 
-                Nodo *aBorrar = raiz;
-                if (ultimoSignificado == 0) {
-                    //es decir no hay nadie en el medio pero se puede seperar la cosa
-                    //en este caso es donde tengo que ver que si hay alguno con otro hijo!
-                    //me importa la ultima bifurcacion!
-                    if(ultimaSeparacion == 0){
-                        delete aBorrar->siguientes[int(clave[0])];
-                        aBorrar->siguientes = vector<Nodo *>(256,NULL);
-                        _size--;
-                    }else{
-                        for (int i = 0; i <= ultimaSeparacion; ++i) {
-                            pos = int(clave[i]);
-                            aBorrar = aBorrar->siguientes[pos];
-                        }
-                        //delete aBorrar;
-                        aBorrar->siguientes = vector<Nodo*>(256,NULL);
-                        _size--;
-                    }
-                } else {
-                    for (int i = 0; i <= ultimoSignificado; ++i) {
+                if(ultimaSeparacion != 0){
+                    for (int i = 0; i < ultimaSeparacion; ++i) {
                         pos = int(clave[i]);
                         aBorrar = aBorrar->siguientes[pos];
                     }
-                    delete aBorrar;
-                    aBorrar->siguientes = vector<Nodo *>(256, NULL);
+                    delete aBorrar->siguientes[int(clave[ultimaSeparacion])];
+                    aBorrar->siguientes[int(clave[ultimaSeparacion])] = NULL;
+                    _size--; //aca hablo de los 2 casos
+                }else if(ultimaSeparacion == 0 && ultimoSignificado != 0) {
+                    for (int i = 0; i < ultimoSignificado; ++i) {
+                        pos = int(clave[i]);
+                        aBorrar = aBorrar->siguientes[pos];
+                    }
+                    delete aBorrar->siguientes[int(clave[ultimoSignificado])];
+                    aBorrar->siguientes[int(clave[ultimoSignificado])] = NULL;
+                    _size--;
+                }else if(ultimaSeparacion == 0 && ultimoSignificado == 0){
+                    delete aBorrar->siguientes[int(clave[0])];
+                    aBorrar->siguientes[int(clave[0])] = NULL;
                     _size--;
                 }
+
             } else {
                 //es decir esta en el medio, solo borra su significado
                 delete aux->significado;
                 aux->significado = NULL;
                 _size--;
-                //y listo el pollo
+                //este caso anda perfecto
             }
         }
     }
-
-    /*if (count(clave) == 1) {
-        int longClave = clave.size();
-        int nombre;
-        Nodo *aux = raiz;
-
-        if (longClave == 1) {
-            nombre = int(clave[0]);
-            if(aux->siguientes[nombre] != NULL){
-                //hay que preguntarse si tiene mas hijos
-                int count = 0;
-                for (int i = 0; i < 256 ; ++i) {
-                    if((aux->siguientes[nombre])->siguientes[i] != NULL){
-                        count++;
-                    }
-                }
-                if(count > 1){
-                    delete aux->significado;
-                }
-            }
-        } else {
-            for (int i = 0; i < longClave; ++i) {
-                nombre = int(clave[i]);
-                if (aux->siguientes[nombre] == NULL) {
-                    return;
-                } else {
-                    for (int j = 0; j < 256 && (i != longClave - 1) && j != nombre && j != int(clave[i + 1]); ++j) {
-                        if ((aux->siguientes[nombre])->siguientes[j] != NULL) {
-                            borrarDesde = i; //aca se fija si tiene mas de un hijo y si es asi marcamos desde donde borramos
-                        }
-                    }
-                    aux = aux->siguientes[nombre]; //solo avanzamos
-                }
-            }
-            delete aux->significado;
-        }
-
-        Nodo *aBorrar = raiz;
-
-        for (int i = 0; i < longClave; ++i) {
-            nombre = int(clave[i]);
-            if (borrarDesde == 0) {
-                delete raiz;
-                raiz = NULL;
-            } else if (i < borrarDesde) {
-                aBorrar = aBorrar->siguientes[nombre];
-            } else {
-                delete aBorrar;
-            }
-        }
-
-        --_size;
-
-        //aux->significado = NULL;
-    }*/
 }
 
 template<typename T>
@@ -267,18 +189,4 @@ bool string_map<T>::empty() const {
         return true;
     else
         return false;
-}
-
-template<class T>
-void string_map<T>::deleteRecursivo(string_map<T>::Nodo *aBorrar, const string &clave, int i) {
-    if (aBorrar != NULL) {
-        return;
-    } else { //ya le tenemos que pasar a borrar la posicion 0
-        int pos = int(clave[i]);
-        deleteRecursivo(aBorrar->siguientes[pos], clave, i + 1);
-        delete aBorrar;
-        aBorrar->significado = NULL;
-        aBorrar->siguientes = vector<Nodo *>(256, NULL);
-    }
-
 }
